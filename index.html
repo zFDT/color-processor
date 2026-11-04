@@ -1,0 +1,1002 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>颜色容差定义实验台</title>
+    <style>
+      :root {
+        --bg: #0b1020;
+        --card-2: #1a2544;
+        --text: #eef3ff;
+        --muted: #a7b1cc;
+        --ok: #28c76f;
+        --warn: #ff9f43;
+        --bad: #ea5455;
+        --line: #2f3e68;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+        color: var(--text);
+        background: radial-gradient(1200px 800px at 10% -10%, #263866 0%, var(--bg) 45%);
+      }
+
+      .wrap {
+        max-width: 1300px;
+        margin: 24px auto;
+        padding: 0 16px 28px;
+      }
+
+      h1 {
+        margin: 0 0 6px;
+        font-size: 28px;
+      }
+
+      .subtitle {
+        color: var(--muted);
+        margin: 0 0 18px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 420px 1fr;
+        gap: 16px;
+      }
+
+      .card {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0));
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 14px;
+      }
+
+      .card h2 {
+        margin: 0 0 12px;
+        font-size: 18px;
+      }
+
+      .wheel-box {
+        display: grid;
+        place-items: center;
+      }
+
+      #wheel {
+        border-radius: 50%;
+        border: 1px solid #4c5c8f;
+        cursor: crosshair;
+        width: 320px;
+        height: 320px;
+      }
+
+      #hvMap {
+        border: 1px solid #4c5c8f;
+        border-radius: 10px;
+        width: 320px;
+        height: 160px;
+      }
+
+      .range-wheel-wrap {
+        display: grid;
+        place-items: center;
+        margin: 10px 0;
+      }
+
+      #rangeWheel {
+        border: 1px solid #4c5c8f;
+        border-radius: 50%;
+        width: 220px;
+        height: 220px;
+      }
+
+      .row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin: 10px 0;
+        flex-wrap: wrap;
+      }
+
+      .row label {
+        color: var(--muted);
+        min-width: 115px;
+      }
+
+      .row input[type="range"] {
+        width: 200px;
+      }
+
+      .row input[type="number"] {
+        width: 84px;
+        padding: 6px 8px;
+        border-radius: 8px;
+        border: 1px solid var(--line);
+        background: var(--card-2);
+        color: var(--text);
+      }
+
+      input[type="color"] {
+        width: 52px;
+        height: 34px;
+        border: none;
+        padding: 0;
+        background: transparent;
+        cursor: pointer;
+      }
+
+      button,
+      textarea {
+        border-radius: 8px;
+        border: 1px solid var(--line);
+        background: var(--card-2);
+        color: var(--text);
+      }
+
+      button {
+        padding: 8px 10px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        filter: brightness(1.1);
+      }
+
+      .swatch {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .swatch .color {
+        height: 70px;
+      }
+
+      .swatch .txt {
+        padding: 8px;
+        font-size: 13px;
+        color: var(--muted);
+        background: rgba(0, 0, 0, 0.12);
+      }
+
+      .criteria {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(220px, 1fr));
+        gap: 12px;
+      }
+
+      .criteria .mini {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 10px;
+      }
+
+      .mini h3 {
+        margin: 0 0 8px;
+        font-size: 14px;
+      }
+
+      .mini .sub {
+        color: var(--muted);
+        font-size: 12px;
+        margin-bottom: 6px;
+      }
+
+      .ok {
+        color: var(--ok);
+      }
+
+      .bad {
+        color: var(--bad);
+      }
+
+      .warn {
+        color: var(--warn);
+      }
+
+      #examples {
+        margin-top: 10px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        gap: 8px;
+      }
+
+      .example {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .example .patch {
+        height: 44px;
+      }
+
+      .example .meta {
+        font-size: 11px;
+        padding: 6px;
+        color: var(--muted);
+        line-height: 1.3;
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 130px;
+        padding: 10px;
+        font-family: Consolas, "Courier New", monospace;
+      }
+
+      .tips {
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      @media (max-width: 1100px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        .criteria {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>颜色容差定义实验台</h1>
+      <p class="subtitle">
+        目标：让“数据上不同，但产品上可视为相同”的颜色有可操作、可解释、可导出的定义。
+      </p>
+
+      <div class="grid">
+        <section class="card">
+          <h2>1) 基准色选择（色轮 + 明度）</h2>
+          <div class="wheel-box">
+            <canvas id="wheel" width="320" height="320"></canvas>
+          </div>
+
+          <div class="row">
+            <label for="valueRange">明度 V</label>
+            <input id="valueRange" type="range" min="1" max="100" value="100" />
+            <span id="valueText">100%</span>
+          </div>
+
+          <div class="row">
+            <label>基准色</label>
+            <input id="basePicker" type="color" value="#4f8cff" />
+            <span id="baseText"></span>
+          </div>
+
+          <div class="swatch" style="margin-top: 10px">
+            <div id="baseSwatch" class="color"></div>
+            <div class="txt">当前基准色</div>
+          </div>
+
+          <div class="card" style="margin-top: 12px; padding: 10px">
+            <h2 style="font-size: 16px; margin-bottom: 8px">色相-明度剖面（固定当前饱和度）</h2>
+            <div class="tips">横轴：H(0~360°)，纵轴：V(100%→0%)。绿色蒙层表示符合容差。</div>
+            <div class="wheel-box" style="margin-top: 8px">
+              <canvas id="hvMap" width="320" height="160"></canvas>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>2) 容差定义（可组合）</h2>
+
+          <div class="criteria">
+            <div class="mini">
+              <h3>
+                <input id="useRgbBox" type="checkbox" checked /> RGB 通道容差
+              </h3>
+              <div class="sub">分别约束 R/G/B 的绝对差值</div>
+              <div class="row"><label>|ΔR| ≤</label><input id="tolR" type="number" min="0" max="255" value="18" /></div>
+              <div class="row"><label>|ΔG| ≤</label><input id="tolG" type="number" min="0" max="255" value="18" /></div>
+              <div class="row"><label>|ΔB| ≤</label><input id="tolB" type="number" min="0" max="255" value="18" /></div>
+            </div>
+
+            <div class="mini">
+              <h3>
+                <input id="useRgbDistance" type="checkbox" checked /> RGB 欧式距离
+              </h3>
+              <div class="sub">整体差值 d=√((ΔR)^2+(ΔG)^2+(ΔB)^2)</div>
+              <div class="row"><label>d ≤</label><input id="tolDist" type="number" min="0" max="441" value="26" /></div>
+            </div>
+
+            <div class="mini">
+              <h3>
+                <input id="useDeltaE" type="checkbox" checked /> 感知差异 ΔE00
+              </h3>
+              <div class="sub">更接近人眼感知，常用于“看起来是否同色”</div>
+              <div class="row"><label>ΔE00 ≤</label><input id="tolDE" type="number" min="0" max="100" step="0.1" value="6" /></div>
+            </div>
+
+            <div class="mini">
+              <h3>
+                <input id="useHsl" type="checkbox" /> HSL 方向容差
+              </h3>
+              <div class="sub">按色相/饱和度/明度方向定义容差（产品常用）</div>
+              <div class="row"><label>|ΔH| ≤</label><input id="tolH" type="number" min="0" max="180" value="12" /></div>
+              <div class="row"><label>|ΔS| ≤</label><input id="tolS" type="number" min="0" max="100" value="15" /></div>
+              <div class="row"><label>|ΔL| ≤</label><input id="tolL" type="number" min="0" max="100" value="12" /></div>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top: 12px">
+            <button id="genBtn">生成容差范围与示例</button>
+            <span id="statusText" class="tips"></span>
+          </div>
+
+          <div class="card" style="margin-top: 12px; padding: 10px">
+            <h2 style="font-size: 16px; margin-bottom: 8px">3) 容差范围 + 示例颜色</h2>
+            <div class="tips">附加可视化：下方“色轮命中区域（当前明度V）”只显示满足容差的颜色区域。</div>
+            <div class="range-wheel-wrap">
+              <canvas id="rangeWheel" width="220" height="220"></canvas>
+            </div>
+            <div id="rangeText" class="tips"></div>
+            <div id="examples"></div>
+          </div>
+
+          <div class="card" style="margin-top: 12px; padding: 10px">
+            <h2 style="font-size: 16px; margin-bottom: 8px">4) 自动输出“同色定义”</h2>
+            <textarea id="definition" readonly></textarea>
+            <div class="row">
+              <button id="copyBtn">复制定义</button>
+              <span id="copyMsg" class="tips"></span>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <section class="card" style="margin-top: 16px">
+        <h2>实操建议（产品可直接拿来定规则）</h2>
+        <ul class="tips">
+          <li>先启用 <b>ΔE00 + RGB通道容差</b>，这是“主观感知 + 工程可控”的折中组合。</li>
+          <li>品牌色/关键主色建议更严格（如 ΔE00 ≤ 3~5），功能色可放宽（如 ΔE00 ≤ 6~10）。</li>
+          <li>如果发现“色相偏了但仍判定相同”，请加上 HSL 的 |ΔH| 约束。</li>
+        </ul>
+      </section>
+    </div>
+
+    <script>
+      const wheel = document.getElementById("wheel");
+      const rangeWheel = document.getElementById("rangeWheel");
+      const hvMap = document.getElementById("hvMap");
+
+      const wheelCtx = wheel.getContext("2d");
+      const rangeCtx = rangeWheel.getContext("2d");
+      const hvCtx = hvMap.getContext("2d");
+
+      const size = wheel.width;
+      const center = size / 2;
+      const radius = size / 2 - 2;
+
+      const rangeSize = rangeWheel.width;
+      const rangeCenter = rangeSize / 2;
+      const rangeRadius = rangeSize / 2 - 2;
+
+      const el = {
+        valueRange: document.getElementById("valueRange"),
+        valueText: document.getElementById("valueText"),
+        basePicker: document.getElementById("basePicker"),
+        baseText: document.getElementById("baseText"),
+        baseSwatch: document.getElementById("baseSwatch"),
+        useRgbBox: document.getElementById("useRgbBox"),
+        useRgbDistance: document.getElementById("useRgbDistance"),
+        useDeltaE: document.getElementById("useDeltaE"),
+        useHsl: document.getElementById("useHsl"),
+        tolR: document.getElementById("tolR"),
+        tolG: document.getElementById("tolG"),
+        tolB: document.getElementById("tolB"),
+        tolDist: document.getElementById("tolDist"),
+        tolDE: document.getElementById("tolDE"),
+        tolH: document.getElementById("tolH"),
+        tolS: document.getElementById("tolS"),
+        tolL: document.getElementById("tolL"),
+        definition: document.getElementById("definition"),
+        genBtn: document.getElementById("genBtn"),
+        statusText: document.getElementById("statusText"),
+        rangeText: document.getElementById("rangeText"),
+        examples: document.getElementById("examples"),
+        copyBtn: document.getElementById("copyBtn"),
+        copyMsg: document.getElementById("copyMsg")
+      };
+
+      let baseRgb = hexToRgb(el.basePicker.value);
+      let baseHsv = rgbToHsv(baseRgb.r, baseRgb.g, baseRgb.b);
+      let draggingWheel = false;
+
+      function clamp(v, min, max) {
+        return Math.min(max, Math.max(min, v));
+      }
+
+      function round(n, p = 2) {
+        const m = 10 ** p;
+        return Math.round(n * m) / m;
+      }
+
+      function hexToRgb(hex) {
+        const h = hex.replace("#", "");
+        const n = parseInt(h, 16);
+        return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+      }
+
+      function rgbToHex(r, g, b) {
+        const toHex = (v) => v.toString(16).padStart(2, "0");
+        return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+      }
+
+      function rgbText(c) {
+        return `rgb(${c.r}, ${c.g}, ${c.b})`;
+      }
+
+      function hsvToRgb(h, s, v) {
+        const c = v * s;
+        const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+        const m = v - c;
+        let r1 = 0, g1 = 0, b1 = 0;
+
+        if (h >= 0 && h < 60) [r1, g1, b1] = [c, x, 0];
+        else if (h < 120) [r1, g1, b1] = [x, c, 0];
+        else if (h < 180) [r1, g1, b1] = [0, c, x];
+        else if (h < 240) [r1, g1, b1] = [0, x, c];
+        else if (h < 300) [r1, g1, b1] = [x, 0, c];
+        else [r1, g1, b1] = [c, 0, x];
+
+        return {
+          r: Math.round((r1 + m) * 255),
+          g: Math.round((g1 + m) * 255),
+          b: Math.round((b1 + m) * 255)
+        };
+      }
+
+      function rgbToHsv(r, g, b) {
+        r /= 255;
+        g /= 255;
+        b /= 255;
+        const max = Math.max(r, g, b), min = Math.min(r, g, b);
+        const d = max - min;
+        let h = 0;
+        if (d === 0) h = 0;
+        else if (max === r) h = 60 * (((g - b) / d) % 6);
+        else if (max === g) h = 60 * ((b - r) / d + 2);
+        else h = 60 * ((r - g) / d + 4);
+        if (h < 0) h += 360;
+        const s = max === 0 ? 0 : d / max;
+        const v = max;
+        return { h, s, v };
+      }
+
+      function rgbToHsl(r, g, b) {
+        r /= 255;
+        g /= 255;
+        b /= 255;
+        const max = Math.max(r, g, b), min = Math.min(r, g, b);
+        const l = (max + min) / 2;
+        let h = 0, s = 0;
+        const d = max - min;
+        if (d !== 0) {
+          s = d / (1 - Math.abs(2 * l - 1));
+          if (max === r) h = 60 * (((g - b) / d) % 6);
+          else if (max === g) h = 60 * ((b - r) / d + 2);
+          else h = 60 * ((r - g) / d + 4);
+        }
+        if (h < 0) h += 360;
+        return { h, s: s * 100, l: l * 100 };
+      }
+
+      function srgbToLinear(v) {
+        const n = v / 255;
+        return n <= 0.04045 ? n / 12.92 : ((n + 0.055) / 1.055) ** 2.4;
+      }
+
+      function rgbToXyz(r, g, b) {
+        const R = srgbToLinear(r);
+        const G = srgbToLinear(g);
+        const B = srgbToLinear(b);
+        return {
+          x: (R * 0.4124564 + G * 0.3575761 + B * 0.1804375) * 100,
+          y: (R * 0.2126729 + G * 0.7151522 + B * 0.072175) * 100,
+          z: (R * 0.0193339 + G * 0.119192 + B * 0.9503041) * 100
+        };
+      }
+
+      function xyzToLab(x, y, z) {
+        const Xn = 95.047;
+        const Yn = 100;
+        const Zn = 108.883;
+        const f = (t) => (t > 0.008856451679 ? Math.cbrt(t) : (7.787037037 * t + 16 / 116));
+        const fx = f(x / Xn);
+        const fy = f(y / Yn);
+        const fz = f(z / Zn);
+        return { L: 116 * fy - 16, a: 500 * (fx - fy), b: 200 * (fy - fz) };
+      }
+
+      function rgbToLab(rgb) {
+        const xyz = rgbToXyz(rgb.r, rgb.g, rgb.b);
+        return xyzToLab(xyz.x, xyz.y, xyz.z);
+      }
+
+      function deltaE00(lab1, lab2) {
+        const { L: L1, a: a1, b: b1 } = lab1;
+        const { L: L2, a: a2, b: b2 } = lab2;
+
+        const avgLp = (L1 + L2) / 2;
+        const C1 = Math.sqrt(a1 * a1 + b1 * b1);
+        const C2 = Math.sqrt(a2 * a2 + b2 * b2);
+        const avgC = (C1 + C2) / 2;
+        const G = 0.5 * (1 - Math.sqrt((avgC ** 7) / (avgC ** 7 + 25 ** 7)));
+
+        const a1p = (1 + G) * a1;
+        const a2p = (1 + G) * a2;
+        const C1p = Math.sqrt(a1p * a1p + b1 * b1);
+        const C2p = Math.sqrt(a2p * a2p + b2 * b2);
+        const avgCp = (C1p + C2p) / 2;
+
+        const hPrime = (a, b) => {
+          if (a === 0 && b === 0) return 0;
+          let h = (Math.atan2(b, a) * 180) / Math.PI;
+          if (h < 0) h += 360;
+          return h;
+        };
+
+        const h1p = hPrime(a1p, b1);
+        const h2p = hPrime(a2p, b2);
+        const dLp = L2 - L1;
+        const dCp = C2p - C1p;
+
+        let dhp;
+        if (C1p * C2p === 0) dhp = 0;
+        else if (Math.abs(h2p - h1p) <= 180) dhp = h2p - h1p;
+        else if (h2p <= h1p) dhp = h2p - h1p + 360;
+        else dhp = h2p - h1p - 360;
+
+        const dHp = 2 * Math.sqrt(C1p * C2p) * Math.sin((dhp / 2) * (Math.PI / 180));
+
+        let avgHp;
+        if (C1p * C2p === 0) avgHp = h1p + h2p;
+        else if (Math.abs(h1p - h2p) <= 180) avgHp = (h1p + h2p) / 2;
+        else if (h1p + h2p < 360) avgHp = (h1p + h2p + 360) / 2;
+        else avgHp = (h1p + h2p - 360) / 2;
+
+        const T = 1
+          - 0.17 * Math.cos((avgHp - 30) * (Math.PI / 180))
+          + 0.24 * Math.cos((2 * avgHp) * (Math.PI / 180))
+          + 0.32 * Math.cos((3 * avgHp + 6) * (Math.PI / 180))
+          - 0.20 * Math.cos((4 * avgHp - 63) * (Math.PI / 180));
+
+        const dTheta = 30 * Math.exp(-(((avgHp - 275) / 25) ** 2));
+        const Rc = 2 * Math.sqrt((avgCp ** 7) / (avgCp ** 7 + 25 ** 7));
+        const Sl = 1 + (0.015 * ((avgLp - 50) ** 2)) / Math.sqrt(20 + ((avgLp - 50) ** 2));
+        const Sc = 1 + 0.045 * avgCp;
+        const Sh = 1 + 0.015 * avgCp * T;
+        const Rt = -Math.sin(2 * dTheta * (Math.PI / 180)) * Rc;
+
+        return Math.sqrt(
+          (dLp / Sl) ** 2 +
+          (dCp / Sc) ** 2 +
+          (dHp / Sh) ** 2 +
+          Rt * (dCp / Sc) * (dHp / Sh)
+        );
+      }
+
+      function hueDiff(h1, h2) {
+        const d = Math.abs(h1 - h2);
+        return Math.min(d, 360 - d);
+      }
+
+      function getTolerances() {
+        return {
+          useRgbBox: el.useRgbBox.checked,
+          useRgbDistance: el.useRgbDistance.checked,
+          useDeltaE: el.useDeltaE.checked,
+          useHsl: el.useHsl.checked,
+          tolR: clamp(Number(el.tolR.value) || 0, 0, 255),
+          tolG: clamp(Number(el.tolG.value) || 0, 0, 255),
+          tolB: clamp(Number(el.tolB.value) || 0, 0, 255),
+          tolDist: clamp(Number(el.tolDist.value) || 0, 0, 441),
+          tolDE: clamp(Number(el.tolDE.value) || 0, 0, 100),
+          tolH: clamp(Number(el.tolH.value) || 0, 0, 180),
+          tolS: clamp(Number(el.tolS.value) || 0, 0, 100),
+          tolL: clamp(Number(el.tolL.value) || 0, 0, 100)
+        };
+      }
+
+      function getEnabledRuleCount(tol) {
+        return [tol.useRgbBox, tol.useRgbDistance, tol.useDeltaE, tol.useHsl].filter(Boolean).length;
+      }
+
+      function createBaseCtx(base) {
+        return {
+          rgb: base,
+          lab: rgbToLab(base),
+          hsl: rgbToHsl(base.r, base.g, base.b)
+        };
+      }
+
+      function compareWithBase(baseCtx, target, tol) {
+        const dR = Math.abs(baseCtx.rgb.r - target.r);
+        const dG = Math.abs(baseCtx.rgb.g - target.g);
+        const dB = Math.abs(baseCtx.rgb.b - target.b);
+        const dist = Math.sqrt((baseCtx.rgb.r - target.r) ** 2 + (baseCtx.rgb.g - target.g) ** 2 + (baseCtx.rgb.b - target.b) ** 2);
+
+        const de = deltaE00(baseCtx.lab, rgbToLab(target));
+        const th = rgbToHsl(target.r, target.g, target.b);
+        const dH = hueDiff(baseCtx.hsl.h, th.h);
+        const dS = Math.abs(baseCtx.hsl.s - th.s);
+        const dL = Math.abs(baseCtx.hsl.l - th.l);
+
+        const passRgbBox = !tol.useRgbBox || (dR <= tol.tolR && dG <= tol.tolG && dB <= tol.tolB);
+        const passDist = !tol.useRgbDistance || dist <= tol.tolDist;
+        const passDe = !tol.useDeltaE || de <= tol.tolDE;
+        const passHsl = !tol.useHsl || (dH <= tol.tolH && dS <= tol.tolS && dL <= tol.tolL);
+        const enabledCount = getEnabledRuleCount(tol);
+
+        return {
+          dR, dG, dB, dist, de, dH, dS, dL,
+          pass: enabledCount > 0 && passRgbBox && passDist && passDe && passHsl,
+          enabledCount
+        };
+      }
+
+      function drawMarker(ctx, cX, cY, r) {
+        const hRad = (baseHsv.h * Math.PI) / 180;
+        const x = cX + baseHsv.s * r * Math.cos(hRad);
+        const y = cY + baseHsv.s * r * Math.sin(hRad);
+
+        ctx.beginPath();
+        ctx.arc(x, y, 6, 0, Math.PI * 2);
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "white";
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(x, y, 8, 0, Math.PI * 2);
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = "black";
+        ctx.stroke();
+      }
+
+      function drawWheelWithTolerance(tol, baseCtx) {
+        const v = Number(el.valueRange.value) / 100;
+        el.valueText.textContent = `${el.valueRange.value}%`;
+
+        const image = wheelCtx.createImageData(size, size);
+        const data = image.data;
+
+        for (let y = 0; y < size; y++) {
+          for (let x = 0; x < size; x++) {
+            const dx = x - center;
+            const dy = y - center;
+            const rr = Math.sqrt(dx * dx + dy * dy);
+            const idx = (y * size + x) * 4;
+            if (rr <= radius) {
+              let h = (Math.atan2(dy, dx) * 180) / Math.PI;
+              if (h < 0) h += 360;
+              const s = rr / radius;
+              const rgb = hsvToRgb(h, s, v);
+              data[idx] = rgb.r;
+              data[idx + 1] = rgb.g;
+              data[idx + 2] = rgb.b;
+              data[idx + 3] = 255;
+            } else {
+              data[idx + 3] = 0;
+            }
+          }
+        }
+
+        wheelCtx.putImageData(image, 0, 0);
+
+        if (getEnabledRuleCount(tol) > 0) {
+          const sampleStep = 4;
+          for (let y = 0; y < size; y += sampleStep) {
+            for (let x = 0; x < size; x += sampleStep) {
+              const dx = x - center;
+              const dy = y - center;
+              const rr = Math.sqrt(dx * dx + dy * dy);
+              if (rr > radius) continue;
+
+              let h = (Math.atan2(dy, dx) * 180) / Math.PI;
+              if (h < 0) h += 360;
+              const s = rr / radius;
+              const rgb = hsvToRgb(h, s, v);
+              const cmp = compareWithBase(baseCtx, rgb, tol);
+              if (cmp.pass) {
+                wheelCtx.fillStyle = "rgba(0, 255, 170, 0.28)";
+                wheelCtx.fillRect(x - 1, y - 1, sampleStep, sampleStep);
+              }
+            }
+          }
+        }
+
+        drawMarker(wheelCtx, center, center, radius);
+      }
+
+      function drawRangeWheel(tol, baseCtx) {
+        const v = Number(el.valueRange.value) / 100;
+        rangeCtx.clearRect(0, 0, rangeSize, rangeSize);
+
+        rangeCtx.fillStyle = "rgba(13,20,40,0.9)";
+        rangeCtx.beginPath();
+        rangeCtx.arc(rangeCenter, rangeCenter, rangeRadius + 1, 0, Math.PI * 2);
+        rangeCtx.fill();
+
+        const sampleStep = 3;
+        if (getEnabledRuleCount(tol) > 0) {
+          for (let y = 0; y < rangeSize; y += sampleStep) {
+            for (let x = 0; x < rangeSize; x += sampleStep) {
+              const dx = x - rangeCenter;
+              const dy = y - rangeCenter;
+              const rr = Math.sqrt(dx * dx + dy * dy);
+              if (rr > rangeRadius) continue;
+
+              let h = (Math.atan2(dy, dx) * 180) / Math.PI;
+              if (h < 0) h += 360;
+              const s = rr / rangeRadius;
+              const rgb = hsvToRgb(h, s, v);
+              const cmp = compareWithBase(baseCtx, rgb, tol);
+              if (cmp.pass) {
+                rangeCtx.fillStyle = rgbToHex(rgb.r, rgb.g, rgb.b);
+                rangeCtx.fillRect(x - 1, y - 1, sampleStep, sampleStep);
+              }
+            }
+          }
+        }
+
+        drawMarker(rangeCtx, rangeCenter, rangeCenter, rangeRadius);
+      }
+
+      function drawHueValueMap(tol, baseCtx) {
+        const w = hvMap.width;
+        const h = hvMap.height;
+        const fixedS = baseHsv.s;
+        const enabled = getEnabledRuleCount(tol) > 0;
+
+        const image = hvCtx.createImageData(w, h);
+        const data = image.data;
+
+        for (let y = 0; y < h; y++) {
+          for (let x = 0; x < w; x++) {
+            const hue = (x / (w - 1)) * 360;
+            const value = 1 - y / (h - 1);
+            const rgb = hsvToRgb(hue, fixedS, value);
+            const idx = (y * w + x) * 4;
+
+            let r = rgb.r;
+            let g = rgb.g;
+            let b = rgb.b;
+
+            if (enabled) {
+              const cmp = compareWithBase(baseCtx, rgb, tol);
+              if (cmp.pass) {
+                r = Math.round(r * 0.65);
+                g = Math.min(255, Math.round(g * 0.65 + 90));
+                b = Math.round(b * 0.65);
+              } else {
+                r = Math.round(r * 0.45);
+                g = Math.round(g * 0.45);
+                b = Math.round(b * 0.45);
+              }
+            }
+
+            data[idx] = r;
+            data[idx + 1] = g;
+            data[idx + 2] = b;
+            data[idx + 3] = 255;
+          }
+        }
+
+        hvCtx.putImageData(image, 0, 0);
+
+        const x = (baseHsv.h / 360) * (w - 1);
+        const y = (1 - baseHsv.v) * (h - 1);
+        hvCtx.strokeStyle = "white";
+        hvCtx.lineWidth = 1.5;
+        hvCtx.beginPath();
+        hvCtx.arc(x, y, 5, 0, Math.PI * 2);
+        hvCtx.stroke();
+      }
+
+      function pickColorFromWheel(evt) {
+        const rect = wheel.getBoundingClientRect();
+        const x = ((evt.clientX - rect.left) * wheel.width) / rect.width;
+        const y = ((evt.clientY - rect.top) * wheel.height) / rect.height;
+        const dx = x - center;
+        const dy = y - center;
+        const r = Math.sqrt(dx * dx + dy * dy);
+        if (r > radius) return;
+
+        let h = (Math.atan2(dy, dx) * 180) / Math.PI;
+        if (h < 0) h += 360;
+        const s = clamp(r / radius, 0, 1);
+        const v = Number(el.valueRange.value) / 100;
+
+        baseHsv = { h, s, v };
+        baseRgb = hsvToRgb(h, s, v);
+        el.basePicker.value = rgbToHex(baseRgb.r, baseRgb.g, baseRgb.b);
+        refresh();
+      }
+
+      function renderDefinition(tol) {
+        const rules = [];
+        if (tol.useRgbBox) rules.push(`|ΔR| ≤ ${tol.tolR} 且 |ΔG| ≤ ${tol.tolG} 且 |ΔB| ≤ ${tol.tolB}`);
+        if (tol.useRgbDistance) rules.push(`sqrt((ΔR)^2 + (ΔG)^2 + (ΔB)^2) ≤ ${tol.tolDist}`);
+        if (tol.useDeltaE) rules.push(`ΔE00 ≤ ${tol.tolDE}`);
+        if (tol.useHsl) rules.push(`|ΔH| ≤ ${tol.tolH} 且 |ΔS| ≤ ${tol.tolS} 且 |ΔL| ≤ ${tol.tolL}`);
+
+        const definitionObj = {
+          version: "1.1",
+          baseColor: {
+            hex: rgbToHex(baseRgb.r, baseRgb.g, baseRgb.b),
+            rgb: [baseRgb.r, baseRgb.g, baseRgb.b],
+            hsv: {
+              h: round(baseHsv.h, 3),
+              s: round(baseHsv.s * 100, 3),
+              v: round(baseHsv.v * 100, 3)
+            }
+          },
+          sameColorDefinition: {
+            logic: "AND",
+            enabledRules: {
+              rgbChannelTolerance: tol.useRgbBox ? { r: tol.tolR, g: tol.tolG, b: tol.tolB } : null,
+              rgbEuclideanDistance: tol.useRgbDistance ? tol.tolDist : null,
+              deltaE00: tol.useDeltaE ? tol.tolDE : null,
+              hslDirectionTolerance: tol.useHsl ? { h: tol.tolH, s: tol.tolS, l: tol.tolL } : null
+            },
+            statement: rules.length ? `若同时满足：${rules.join("；")}，则判定为同色。` : "未启用任何规则，不判定同色。"
+          },
+          visualization: {
+            wheelSliceV: Math.round(baseHsv.v * 100),
+            hueValueSectionS: round(baseHsv.s * 100, 3)
+          }
+        };
+
+        el.definition.value = JSON.stringify(definitionObj, null, 2);
+      }
+
+      function renderStatus(tol) {
+        const enabled = getEnabledRuleCount(tol);
+        if (enabled === 0) {
+          el.statusText.innerHTML = `<span class="warn">请至少启用一个容差规则</span>`;
+        } else {
+          el.statusText.innerHTML = `<span class="ok">已启用 ${enabled} 条规则（AND 逻辑）</span>`;
+        }
+      }
+
+      function generateRangeAndExamples() {
+        const tol = getTolerances();
+        const baseCtx = createBaseCtx(baseRgb);
+        const step = 16;
+        const maxExamples = 24;
+
+        const matches = [];
+        let total = 0;
+
+        for (let r = 0; r <= 255; r += step) {
+          for (let g = 0; g <= 255; g += step) {
+            for (let b = 0; b <= 255; b += step) {
+              total += 1;
+              const c = { r, g, b };
+              const cmp = compareWithBase(baseCtx, c, tol);
+              if (cmp.pass) {
+                const score = cmp.de + cmp.dist * 0.05;
+                matches.push({ c, cmp, score });
+              }
+            }
+          }
+        }
+
+        if (matches.length === 0) {
+          el.rangeText.innerHTML = `<span class="bad">在当前容差定义下，采样网格中未找到可归类为同色的颜色。</span>`;
+          el.examples.innerHTML = "";
+          return;
+        }
+
+        matches.sort((a, b) => a.score - b.score);
+
+        let minR = 255, minG = 255, minB = 255;
+        let maxR = 0, maxG = 0, maxB = 0;
+        for (const m of matches) {
+          minR = Math.min(minR, m.c.r);
+          minG = Math.min(minG, m.c.g);
+          minB = Math.min(minB, m.c.b);
+          maxR = Math.max(maxR, m.c.r);
+          maxG = Math.max(maxG, m.c.g);
+          maxB = Math.max(maxB, m.c.b);
+        }
+
+        const ratio = (matches.length / total) * 100;
+        el.rangeText.innerHTML = `
+          命中范围（基于步长 ${step} 的 RGB 采样）：<br/>
+          R ∈ [${minR}, ${maxR}], G ∈ [${minG}, ${maxG}], B ∈ [${minB}, ${maxB}]。<br/>
+          采样命中率：<b>${round(ratio, 2)}%</b>（${matches.length}/${total}）。
+        `;
+
+        const top = matches.slice(0, maxExamples);
+        el.examples.innerHTML = top
+          .map((m) => {
+            const c = m.c;
+            const hex = rgbToHex(c.r, c.g, c.b);
+            return `
+              <div class="example">
+                <div class="patch" style="background:${hex}"></div>
+                <div class="meta">
+                  ${hex}<br/>
+                  rgb(${c.r},${c.g},${c.b})<br/>
+                  ΔE00=${round(m.cmp.de, 2)}, d=${round(m.cmp.dist, 2)}
+                </div>
+              </div>
+            `;
+          })
+          .join("");
+      }
+
+      function refresh() {
+        el.baseText.textContent = `${rgbToHex(baseRgb.r, baseRgb.g, baseRgb.b)} / ${rgbText(baseRgb)}`;
+        el.baseSwatch.style.background = rgbToHex(baseRgb.r, baseRgb.g, baseRgb.b);
+
+        const tol = getTolerances();
+        const baseCtx = createBaseCtx(baseRgb);
+
+        drawWheelWithTolerance(tol, baseCtx);
+        drawRangeWheel(tol, baseCtx);
+        drawHueValueMap(tol, baseCtx);
+        renderStatus(tol);
+        renderDefinition(tol);
+      }
+
+      wheel.addEventListener("mousedown", (e) => {
+        draggingWheel = true;
+        pickColorFromWheel(e);
+      });
+      window.addEventListener("mousemove", (e) => {
+        if (draggingWheel) pickColorFromWheel(e);
+      });
+      window.addEventListener("mouseup", () => {
+        draggingWheel = false;
+      });
+
+      el.valueRange.addEventListener("input", () => {
+        baseHsv.v = Number(el.valueRange.value) / 100;
+        baseRgb = hsvToRgb(baseHsv.h, baseHsv.s, baseHsv.v);
+        el.basePicker.value = rgbToHex(baseRgb.r, baseRgb.g, baseRgb.b);
+        refresh();
+      });
+
+      el.basePicker.addEventListener("input", () => {
+        baseRgb = hexToRgb(el.basePicker.value);
+        baseHsv = rgbToHsv(baseRgb.r, baseRgb.g, baseRgb.b);
+        el.valueRange.value = Math.round(baseHsv.v * 100);
+        refresh();
+      });
+
+      [
+        el.useRgbBox, el.useRgbDistance, el.useDeltaE, el.useHsl,
+        el.tolR, el.tolG, el.tolB, el.tolDist, el.tolDE, el.tolH, el.tolS, el.tolL
+      ].forEach((node) => {
+        node.addEventListener("input", refresh);
+        node.addEventListener("change", refresh);
+      });
+
+      el.genBtn.addEventListener("click", generateRangeAndExamples);
+
+      el.copyBtn.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(el.definition.value);
+          el.copyMsg.textContent = "已复制到剪贴板。";
+        } catch {
+          el.copyMsg.textContent = "复制失败，请手动复制。";
+        }
+      });
+
+      refresh();
+      generateRangeAndExamples();
+    </script>
+  </body>
+</html>
